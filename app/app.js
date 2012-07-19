@@ -8,20 +8,23 @@ Ext.Loader.setConfig({
 Ext.application({
     name: 'App',
 
-	requires:['App.view.GridPanel'], 
+	requires:[
+        'App.view.GridPanel',
+        'App.view.mineView'
+        ], 
 	//stores:[],
 	
     launch: function() {
      	Ext.create('Ext.Window',{
-			width:450,
-			height:310,
+			width:550,
+			height:550,
 			maximizable:true,
 			title:'Buscaminas',
 			autoScroll:true,
 			frame:false,
 			layout:'fit',
 			items:[{
-				xtype:'minegrid'
+				xtype:'mineView'
 			}]
 		}).show();
     }
