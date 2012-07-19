@@ -1,8 +1,7 @@
 /**
  * @class App.view. GridPanel
  * @extends Ext.grid.Panel
- * @author Armando Gonzalez iam@armando.mx
- * @author Ernesto Ramirez 
+ * @author Armando Gonzalez iam@armando.mx	
  * Esta es la definicion del grid que creara nuestro tablero de minas.
  */
 Ext.define('App.view.GridPanel', {

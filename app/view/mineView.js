@@ -12,66 +12,75 @@ Ext.define('App.view.mineView', {
 		var me = this;
 		me.store = me.buildStore();
 		me.itemSelector = ".square";
+		me.trackOver = true;
+		me.overItemCls = 'hover';
 		me.tpl = new Ext.XTemplate(
 	    		'<tpl for=".">',
-	    			'<tpl if="isBorder === 1"><div class="square"> - </div></tpl>',
+	    			'<tpl if="isBorder === 1"><div class="square"></div></tpl>',
 	    			'<tpl if="isBorder === 0">',
-					'<tpl if="isRevealed === 1"><div class="square mineUncovered">{numMines} </div></tpl>',
+					'<tpl if="isRevealed === 1">',
+						'<tpl if="numMines != 0">',
+	    						'<div class="square mine Uncovered{numMines}">{numMines}</div>',
+    						'</tpl>',
+    						'<tpl if="numMines === 0">',
+	    						'<div class="square mine Uncovered{numMines}"></div>',
+    						'</tpl>',
+					'</tpl>',
 	    				'<tpl if="isRevealed === 0">',
 	    					'<tpl if="hasBomb != 1">',
-	    						'<div class="square mineCovered"></div>',
+	    						'<div class="square mine Covered"></div>',
     						'</tpl>',
     						'<tpl if="hasBomb === 1">',
-	    						'<div class="square mineCovered">{hasBomb} </div>',
+	    						'<div class="square mine Covered">*</div>',
     						'</tpl>',
 					'</tpl>',
     				'</tpl>',
 	                 	'<tpl if="( xindex % '+(me.num+2)+' ) === 0 "><div class="x-clear"></div></tpl>',
 	            '</tpl>'
 		);
-		this.callParent(arguments);
-		this.on('itemclick',me.validateMine,this); // evento que se dispara cuando se da click sobre alguna posible mina
+		me.callParent(arguments);
+		me.on('itemclick',me.validateMine,me); // evento que se dispara cuando se da click sobre alguna posible mina
 	},
 	validateMine:function( table, record, item, index, e, eOpts ){
-		//console.log(Ext.get(e.target).setHTML("asdfghj"));	
-		if( record.get('isRevealed') === 0){ // si existe mina la explotamos
-			this.revealMine(record,item);
-		} else {
-			console.log("already revealed");
-		}
-	},
-	revealMine:function(record,item){ // creamos las columnas de nuestro grid
-		var me = this, revealArray = [];
-		console.log("in revealMine");
-		if(record.get('hasBomb') ){ // si existe mina la explotamos
-			Ext.Msg.alert(':(','kaboooom!. GAME OVER!');
-		} else {
-			record.set('isRevealed', 1);
-			var adjacentMines = this.getAdjacentMines(record.get('id')),
-				numMines = this.countMines(adjacentMines);
-			if(numMines != 0){
-				record.set('numMines', numMines);
-				//item.setHTML(numMines);
+		if( record.get('isRevealed') === 0){ 
+			if(record.get('hasBomb') ){ // si existe mina la explotamos
+				Ext.Msg.alert(':(','kaboooom!. GAME OVER!');
+			} else {
+				this.revealMine(record,item);
 			}
 		}
-		this.refresh();
 	},
-	
+	revealMine:function(record){ 
+		record.set('isRevealed', 1);
+		var adjacentMines = this.getAdjacentMines(record.get('id')),
+			numMines = this.countMines(adjacentMines);
+		if(numMines != 0){
+			record.set('numMines', numMines);
+		}else{
+			this.recursiveReveal(adjacentMines);
+		}
+		this.refresh();
+		return record;
+	},
+	recursiveReveal: function(revealArray){
+		for(var i = 0; i < 8 ; i++){
+			var rec = this.getStore().getAt(revealArray[i]);
+			if( rec.get('isRevealed') === 0){
+				this.revealMine(rec);				
+			}
+		}
+	},
 	countMines:function(adjacentMines){ // creamos las columnas de nuestro grid
-		var me = this, 
-			numMines = 0;
-
+		var numMines = 0;
 		for(var i = 0; i < 8; i++ ){
 			if(this.getStore().getAt(adjacentMines[i]).get('hasBomb'))
 				numMines++;
 		}
 		return numMines;
-		
 	},
-
 	getAdjacentMines:function(id){ // creamos las columnas de nuestro grid
-		var me = this, adjacentMines = [];
-		// NEED to optimize this CODE!!!!! to sleepy
+		var adjacentMines = [];
+		// NEED to optimize this CODE!!!
 		adjacentMines.push(( id -  ( this.num + 3 ) ) );
 		adjacentMines.push(( id -  ( this.num + 2 ) ) );
 		adjacentMines.push(( id -  ( this.num + 1 ) ) );
@@ -80,39 +89,33 @@ Ext.define('App.view.mineView', {
 		adjacentMines.push(( id +  ( this.num + 1 ) ) );
 		adjacentMines.push(( id + ( this.num + 2 ) ) );
 		adjacentMines.push(( id +  ( this.num + 3 ) ) );
-		// NEED to optimize this CODE!!!!! to sleepy
 		return adjacentMines;
 	},
 	buildStore:function(){ //creamos nuestro store que contendra cada una de las entidades de nuestro tablero
 		var me = this, store;
 		Ext.define('Mine', {
 		    extend: 'Ext.data.Model',
-		    fields: [
-		        {
+		    fields: [ {
 		        	name: 'hasBomb',   
 		        	type: 'int'
-		        },
-		        {
+		        },{
 		        	name: 'isRevealed',   
 		        	type: 'int'
-		        },
-		        {
+		        },{
 		        	name: 'isBorder',   
 		        	type: 'int',
 		        	defaultValue: 0
-		        },
-		        {
+		        },{
 		        	name: 'numMines',   
 		        	type: 'int',
 		        	defaultValue: 0
 		        }
 		    ]
 		});
-		
 		store = Ext.create('Ext.data.Store', {
-	        model: 'Mine',
-	        data: me.buildData()
-	    });
+		    	model: 'Mine',
+		    	data: me.buildData()
+		});
 		return store;
 	},
 	buildData:function(){ // aqui creamos nuestras entidades slots para cada una de las filas de nuestro store (Records)
@@ -129,7 +132,6 @@ Ext.define('App.view.mineView', {
 				hasBomb: Math.floor(Math.random()*2),
 				isRevealed: 0
 			} );
-			
 			data.push(row);
 		}
 		return data;

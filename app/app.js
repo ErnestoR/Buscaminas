@@ -16,8 +16,8 @@ Ext.application({
 	
     launch: function() {
      	Ext.create('Ext.Window',{
-			width:550,
-			height:550,
+			width:520,
+			height:520,
 			maximizable:true,
 			title:'Buscaminas',
 			autoScroll:true,
