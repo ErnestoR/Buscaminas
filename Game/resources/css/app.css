@@ -1,0 +1,70 @@
+.square {
+      width: 50px;
+      height: 50px;
+      float: left;
+}
+
+.mine {
+      border: 1px solid black;
+      text-align: center;
+      padding-top: 20px; 
+}
+.Covered {
+      background-color: #A6BCC4;
+      cursor:pointer;
+}
+.Uncovered0 {
+    background-color: transparent;
+}
+
+.Uncovered1 {
+  color: blue;
+}
+
+.Uncovered2 {
+  color: green;
+}
+
+.Uncovered3 {
+  color: red;
+}
+
+.Uncovered4 {
+  color: #112152;
+}
+
+.Uncovered5 {
+  color: #7A0909;
+}
+
+.Uncovered6 {
+  color: ##2299BE;
+}
+
+.Uncovered7 {
+  color: #A42EF3;
+}
+
+.Uncovered8 {
+   color: #252525;
+}
+
+.square .hover {
+      background-color: #A60000 !important;
+}
+
+.json {
+	background-image: url(../images/json.png) !important;
+}
+.css {
+	background-image: url(../images/css.png) !important;
+}
+.html {
+	background-image: url(../images/html.png) !important;
+}
+.js {
+	background-image: url(../images/script_code.png) !important;
+}
+.image {
+	background-image: url(../images/image.png) !important;
+}
