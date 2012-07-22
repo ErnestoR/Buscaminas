@@ -16,8 +16,8 @@ Ext.application({
 	
     launch: function() {
      	Ext.create('Ext.Panel',{
-			width:520,
-			height:520,
+			width:450,
+			height:450,
 			maximizable:true,
 			title:'Buscaminas',
 			autoScroll:true,
